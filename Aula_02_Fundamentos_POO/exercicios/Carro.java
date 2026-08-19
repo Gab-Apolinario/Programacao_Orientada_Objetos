@@ -8,6 +8,7 @@ public class Carro {
     private Random rand = new Random();
     private float coordenada_x = 0;
     private float coordenada_y = 0;
+    private int tempo_estimado = 0;
 
     //Só cria as variáveis, o valor vai ser calculado no método coordenada_aleatoria()
     private float valor_aleatorio_x;
@@ -20,15 +21,6 @@ public class Carro {
     public Carro(int numeroID){
         this.numeroID = numeroID;
         definir_dir();
-    }
-
-    //Gera coordenadas aleatórias
-    public void coordenada_aleatoria(){
-        valor_aleatorio_x = rand.nextFloat() * 15; // Gera um valor aleatório entre 0 e 10
-        valor_aleatorio_y = rand.nextFloat() * 20;
-        float x = this.coordenada_x + valor_aleatorio_x;
-        float y = this.coordenada_y + valor_aleatorio_y;
-        atualizar_coordenadas(x, y);
     }
 
     //private pois só é usado dentro da classe e não pode ser alterado de fora
@@ -69,17 +61,42 @@ public class Carro {
                 }
             }
             
+    //Gera coordenadas aleatórias
+    public void coordenada_aleatoria(){
+        valor_aleatorio_x = rand.nextFloat() * 15; // Gera um valor aleatório entre 0 e 10
+        valor_aleatorio_y = rand.nextFloat() * 20;
+        float x = this.coordenada_x + valor_aleatorio_x;
+        float y = this.coordenada_y + valor_aleatorio_y;
+        estimar_tempo(x, y);
+        atualizar_velocidade(x, y); //Aqui atualiza a velocidade do carro com base na distância percorrida e no tempo de atualização
+        atualizar_coordenadas(x, y); //Aqui atualiza as coordenadas do carro e a direção -> Novo destino
+    }
+    
     //private pois só é usado dentro da classe e não pode ser alterado de fora
     private void atualizar_coordenadas(float x, float y) {
-        atualizar_velocidade(x, y);
         atualizar_direcao(x, y);
         this.coordenada_x = x;
         this.coordenada_y = y;
     }
 
+    //ESTIMATIVA!! Sempre vai dar variação, pois a velocidade do carro muda a cada atualização de coordenadas
+    public int estimar_tempo(float x, float y) {
+        float delta_x = Math.abs(x - this.coordenada_x);
+        float delta_y = Math.abs(y - this.coordenada_y);
+        float distancia_a_percorrer = delta_x + delta_y; // distancia a percorrer
+        if (velocidade == 0) {
+            tempo_estimado = 0;
+            return 0;
+        }
+
+        tempo_estimado = (int) ((distancia_a_percorrer / velocidade) * 60); // tempo estimado em minutos
+        System.out.printf("Tempo estimado para o percurso %.2f, na velocidade %.2f Km: %d minutos\n", distancia_a_percorrer, velocidade, tempo_estimado);
+        return tempo_estimado;
+    }
+    
     public void exibir_dados() {
-        System.out.printf("Carro %d | Velocidade: %.2f Km/h | Direção: %c | Coordenadas: (%.2f, %.2f)\n",
-                this.numeroID, this.velocidade, this.direcao, this.coordenada_x, this.coordenada_y);
+        System.out.printf("Carro %d | Velocidade: %.2f Km/h | Direção: %c | Coordenadas: (%.2f, %.2f) | Tempo estimado: %d minutos\n",
+                this.numeroID, this.velocidade, this.direcao, this.coordenada_x, this.coordenada_y, this.tempo_estimado);
     }
     
     public static void main(String[] args) {
@@ -99,12 +116,16 @@ public class Carro {
         System.out.println("--------------------------------------------------------\n");
         
         System.out.println("--------------------------------------------------------\n");
-        
-        for (int i = 0; i < carros.length; i++){
-            System.out.printf("Atualizando as coordenadas do carro %d...\n", i);
-            carros[i].coordenada_aleatoria();
-            carros[i].exibir_dados();
+        for (int i = 0; i < 3; i++) {
+            System.out.printf("Atualizando as coordenadas dos carros - Iteração %d...\n", i + 1);
             System.out.println("--------------------------------------------------------\n");
+            
+            for (int j = 0; j < carros.length; j++){
+                System.out.printf("Atualizando as coordenadas do carro %d...\n", j);
+                carros[j].coordenada_aleatoria();
+                carros[j].exibir_dados();
+                System.out.println("--------------------------------------------------------\n");
+            }
         }
     }
 }
