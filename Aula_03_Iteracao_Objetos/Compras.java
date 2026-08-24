@@ -40,8 +40,8 @@ class Produto {
 
             ContaBancaria cc_Gabriel = new ContaBancaria(150);
             Produto cadeira = new Produto("Cadeira", 40f, 8);
-            Pedido pedido1 = new Pedido("Gabriel", cadeira, 3);
-            
+            Pedido pedido1 = new Pedido("Gabriel", cadeira, 5);
+
             try {
                 cc_Gabriel.comprar(pedido1);
             }catch (IllegalArgumentException e){
